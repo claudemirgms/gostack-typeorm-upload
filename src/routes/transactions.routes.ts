@@ -28,17 +28,23 @@ transactionsRouter.post('/', async (request, response) => {
   try {
     const createTransaction = new CreateTransactionService();
 
-    const transaction = createTransaction.execute(request.body);
+    const transaction = await createTransaction.execute(request.body);
 
     response.json(transaction);
   } catch (err) {
-    return response.status(400).json({ error: err.message });
+    return response.status(400).json(err);
   }
 });
 
 transactionsRouter.delete('/:id', async (request, response) => {
   try {
     const { id } = request.params;
+
+    const deleteTransaction = new DeleteTransactionService();
+
+    await deleteTransaction.execute(id);
+
+    response.status(204).send();
   } catch (err) {
     return response.status(400).json({ error: err.message });
   }

@@ -3,19 +3,40 @@ import AppError from '../errors/AppError';
 
 import Transaction from '../models/Transaction';
 import TransactionsRepository from '../repositories/TransactionsRepository';
+import CreateCategoryService from './CreateCategoryService';
+
+interface Request {
+  title: string;
+  value: number;
+  type: 'income' | 'outcome';
+  category: string;
+}
 
 class CreateTransactionService {
-  public async execute(request: Transaction): Promise<Transaction> {
+  public async execute({
+    title,
+    value,
+    type,
+    category: titleCategory,
+  }: Request): Promise<Transaction> {
     const transactionsRepository = getCustomRepository(TransactionsRepository);
 
-    if (request.type === 'outcome') {
+    if (type === 'outcome') {
       const balance = await transactionsRepository.getBalance();
 
-      if (request.value > balance.total) {
-        throw new AppError('Saldo Insuficiente');
+      if (value > balance.total) {
+        throw new AppError('Saldo Insuficiente', 'error');
       }
     }
-    const transaction = transactionsRepository.create(request);
+    const createCategory = new CreateCategoryService();
+    const category = await createCategory.execute(titleCategory);
+
+    const transaction = transactionsRepository.create({
+      title,
+      value,
+      type,
+      category_id: category.id,
+    });
 
     await transactionsRepository.save(transaction);
 
