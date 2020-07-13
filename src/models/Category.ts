@@ -1,11 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  OneToMany,
-  OneToOne,
-} from 'typeorm';
-import Transaction from './Transaction';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('categories')
 class Category {
